@@ -39,8 +39,10 @@ This module is part of the scientificProject311 package. Ensure you have the fol
 
 ### Basic Import
 
+To use these optimizers, ensure the `adancfgd.py` file is in your current working directory or added to your Python path, then import directly:
+
 ```python
-from snn.ncf.e34.adancfgd import AdaFGD, AdaNCFGD
+from adancfgd import AdaFGD, AdaNCFGD
 ```
 
 ### Example Usage with a Simple Model
@@ -48,7 +50,7 @@ from snn.ncf.e34.adancfgd import AdaFGD, AdaNCFGD
 ```python
 import torch
 import torch.nn as nn
-from snn.ncf.e34.adancfgd import AdaFGD, AdaNCFGD
+from adancfgd import AdaFGD, AdaNCFGD
 
 # Create a simple model
 model = nn.Linear(10, 1)
