@@ -38,8 +38,24 @@ Both optimizers build upon PyTorch's SGD optimizer, incorporating adaptive learn
 
 ## Installation
 
-This module is part of the scientificProject311 package. Ensure you have the following dependencies:
+This is an independent package. You can install it directly from PyPI:
+
+```bash
+pip install adancfgd
+```
+
+Or from the source code:
+
+```bash
+git clone https://github.com/HunLuanZhiZhu/AdaNCFGD.git
+cd AdaNCFGD
+pip install -e .
+```
+
+### Dependencies
+
 - PyTorch >= 1.7.0
+- NumPy
 - Python >= 3.6
 
 ## Usage
@@ -132,7 +148,9 @@ If you use these optimizers in your research, please consider citing the relevan
 
 ## License
 
-This code is part of the scientificProject311 package and is available under the project's license.
+This code is an independent project available under the MIT License. You can find the full license in the LICENSE file at the project's GitHub repository:
+
+https://github.com/HunLuanZhiZhu/AdaNCFGD/blob/main/LICENSE
 
 """
 
