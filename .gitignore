@@ -1,6 +1,7 @@
 # Python cache directories
 __pycache__/
 
+
 # IDE directories and files
 .vscode/
 .idea/
