@@ -24,7 +24,7 @@ import torchvision
 import torchvision.transforms as transforms
 from tqdm import tqdm  # Import tqdm library for progress bars
 
-from snn_cnn import SNNCNN
+from adancfgd.snn_cnn import SNNCNN
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -269,8 +269,8 @@ def train(model: SNNCNN, name, epochs=25, batch_size=50, device=DEVICE,
 
 
 if __name__ == '__main__':
-    import snn_cnn
-    model = snn_cnn.SNNCNN()
+    from adancfgd.snn_cnn import SNNCNN
+    model = SNNCNN()
     # Train on regular MNIST dataset
     train(model, 'test', mnist_dir='data/')
     # Train on Fashion-MNIST dataset

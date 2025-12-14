@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 from typing import Optional, List
-from snn import SNNDropout, SNNConv2d, SNNLinear, SNNLinearWithBatchNorm, SNNConv2dWithBatchNorm  # Import basic components from snn module
+from .snn import SNNDropout, SNNConv2d, SNNLinear, SNNLinearWithBatchNorm, SNNConv2dWithBatchNorm  # Import basic components from snn module
 
 # Reuse global parameters (consistent with snn file)
 WINDOW_T = 100

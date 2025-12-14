@@ -686,11 +686,13 @@ def adafgd_optimization_performance():
     plt.legend()
     plt.grid(alpha=0.3)
     plt.savefig('adafgd_vs_adancfgd_convergence.png')
+    print("AdaFGD vs AdaNCFGD convergence plot saved as 'adafgd_vs_adancfgd_convergence.png'")
     plt.show()
     #plt.close()
 
     plt.plot([loss1 - loss2 for (loss1, loss2) in zip(epoch_losses[0], epoch_losses[1])])
     plt.savefig('adafgd_vs_adancfgd_diff.png')
+    print("AdaFGD vs AdaNCFGD loss difference plot saved as 'adafgd_vs_adancfgd_diff.png'")
     plt.show()
     #plt.close()
 

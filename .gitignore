@@ -1,6 +1,6 @@
 # Python cache directories
 __pycache__/
-
+*.pyc
 
 # IDE directories and files
 .vscode/
@@ -34,3 +34,27 @@ model/
 # Temporary files
 *.tmp
 *.temp
+test_package_import/
+generate_totp.py
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Type checking
+.mypy_cache/
+
+# pyenv
+.python-version
+
+# tox
+.tox/
+
+# Documentation
+*.html
+docs/_build/
+
+# Other temporary directories
+*.bak/
+*.old/
