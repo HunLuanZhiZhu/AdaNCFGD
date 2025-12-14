@@ -1,9 +1,3 @@
-import math
-import warnings
-import torch
-from torch import Tensor
-from torch.optim import SGD
-
 """
 # Adaptive Fractional Gradient Descent Optimizers (AdaFGD & AdaNCFGD)
 
@@ -153,6 +147,12 @@ This code is an independent project available under the MIT License. You can fin
 https://github.com/HunLuanZhiZhu/AdaNCFGD/blob/main/LICENSE
 
 """
+
+import math
+import warnings
+import torch
+from torch import Tensor
+from torch.optim import SGD
 
 
 try:
