@@ -258,6 +258,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Version History
 
+- **0.1.5** - Enhanced package stability, improved documentation, fixed minor issues, verified uninstall-reinstall functionality
 - **0.1.4** - Complete SNN implementation, fixed import issues, improved documentation
 - **0.1.3** - Fixed package structure, updated __init__.py
 - **0.1.2** - Initial release with AdaFGD and AdaNCFGD optimizers

@@ -15,7 +15,7 @@ from .snn_cnn import (
     SNNCNN
 )
 
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 __author__ = "Yihe Zhu"
 __email__ = "zhu.yihe@qq.com"
 __description__ = "Adaptive Fractional Gradient Descent Optimizers (AdaFGD & AdaNCFGD)"
