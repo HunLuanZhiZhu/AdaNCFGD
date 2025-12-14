@@ -1,0 +1,35 @@
+# Python cache directories
+__pycache__/
+
+# IDE directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Build and distribution directories
+build/
+dist/
+*.egg-info/
+model/
+
+# Log files
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Testing
+.pytest_cache/
+.coverage
+
+# Temporary files
+*.tmp
+*.temp
