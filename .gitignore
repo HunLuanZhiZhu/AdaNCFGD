@@ -58,3 +58,6 @@ docs/_build/
 # Other temporary directories
 *.bak/
 *.old/
+
+# Train
+train_mnist.py
