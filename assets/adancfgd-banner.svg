@@ -1,0 +1,55 @@
+<svg width="1200" height="320" viewBox="0 0 1200 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="320"><stop stop-color="#080B12"/><stop offset=".52" stop-color="#111526"/><stop offset="1" stop-color="#08130F"/></linearGradient>
+  <linearGradient id="accent" x1="700" y1="80" x2="1110" y2="250"><stop stop-color="#7DD3FC"/><stop offset=".5" stop-color="#C084FC"/><stop offset="1" stop-color="#86EFAC"/></linearGradient>
+  <radialGradient id="g1"><stop stop-color="#2563EB" stop-opacity=".20"/><stop offset="1" stop-color="#2563EB" stop-opacity="0"/></radialGradient>
+  <radialGradient id="g2"><stop stop-color="#10B981" stop-opacity=".16"/><stop offset="1" stop-color="#10B981" stop-opacity="0"/></radialGradient>
+  <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" stroke="#D7E2EC" stroke-opacity=".05"/></pattern>
+</defs>
+<rect width="1200" height="320" rx="26" fill="url(#bg)"/>
+<rect width="1200" height="320" rx="26" fill="url(#grid)"/>
+<circle cx="180" cy="42" r="230" fill="url(#g1)"/><circle cx="1060" cy="275" r="250" fill="url(#g2)"/>
+
+<text x="70" y="72" fill="#A7F3D0" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="13" font-weight="700" letter-spacing="2.4">RESEARCH CODE · OPTIMIZATION</text>
+<text x="70" y="130" fill="#F8FAFC" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="51" font-weight="760" letter-spacing="-1.6">AdaNCFGD</text>
+<text x="72" y="170" fill="#CBD5E1" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Adaptive fractional-gradient optimizers for PyTorch.</text>
+<text x="72" y="205" fill="#8FA1B3" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="14.5">AdaFGD · AdaNCFGD · parameter history · adaptive moments · SNN experiments</text>
+
+<g transform="translate(72 235)">
+  <rect width="118" height="34" rx="17" fill="#7DD3FC" fill-opacity=".08" stroke="#7DD3FC" stroke-opacity=".30"/>
+  <text x="59" y="22" text-anchor="middle" fill="#BAE6FD" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="12">PyTorch</text>
+  <rect x="132" width="118" height="34" rx="17" fill="#C084FC" fill-opacity=".08" stroke="#C084FC" stroke-opacity=".30"/>
+  <text x="191" y="22" text-anchor="middle" fill="#E9D5FF" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="12">fractional</text>
+  <rect x="264" width="118" height="34" rx="17" fill="#86EFAC" fill-opacity=".08" stroke="#86EFAC" stroke-opacity=".30"/>
+  <text x="323" y="22" text-anchor="middle" fill="#BBF7D0" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="12">PyPI</text>
+</g>
+
+<g transform="translate(690 50)">
+  <rect width="430" height="220" rx="20" fill="#0C141D" stroke="#FFFFFF" stroke-opacity=".09"/>
+  <text x="24" y="31" fill="#708090" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="10.5">OPTIMIZER VIEW</text>
+
+  <circle cx="56" cy="78" r="18" fill="#7DD3FC" fill-opacity=".10" stroke="#7DD3FC" stroke-opacity=".40"/>
+  <text x="56" y="82" text-anchor="middle" fill="#BAE6FD" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="11">gₜ</text>
+  <path d="M75 78H128" stroke="url(#accent)" stroke-width="2.5"/><path d="M118 72L128 78L118 84" stroke="#C7D2FE" stroke-width="1.5" fill="none"/>
+
+  <rect x="128" y="54" width="118" height="48" rx="12" fill="#C084FC" fill-opacity=".07" stroke="#C084FC" stroke-opacity=".30"/>
+  <text x="187" y="74" text-anchor="middle" fill="#E9D5FF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="11.5" font-weight="700">fractional term</text>
+  <text x="187" y="90" text-anchor="middle" fill="#758493" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="9">parameter history</text>
+
+  <path d="M246 78H290" stroke="url(#accent)" stroke-width="2.5"/><path d="M280 72L290 78L280 84" stroke="#C7D2FE" stroke-width="1.5" fill="none"/>
+
+  <rect x="290" y="54" width="116" height="48" rx="12" fill="#86EFAC" fill-opacity=".07" stroke="#86EFAC" stroke-opacity=".30"/>
+  <text x="348" y="74" text-anchor="middle" fill="#BBF7D0" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="11.5" font-weight="700">adaptive term</text>
+  <text x="348" y="90" text-anchor="middle" fill="#758493" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="9">moment estimates</text>
+
+  <path d="M348 102V134" stroke="url(#accent)" stroke-width="2"/><path d="M342 124L348 134L354 124" stroke="#C7D2FE" stroke-width="1.5" fill="none"/>
+
+  <rect x="132" y="134" width="216" height="54" rx="13" fill="#101923" stroke="#FFFFFF" stroke-opacity=".08"/>
+  <text x="240" y="156" text-anchor="middle" fill="#E2E8F0" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="12" font-weight="700">surrogate optimization gradient</text>
+  <text x="240" y="174" text-anchor="middle" fill="#738290" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="9.5">fractional × adaptive</text>
+
+  <path d="M132 161H78" stroke="url(#accent)" stroke-width="2"/>
+  <circle cx="58" cy="161" r="18" fill="#FFFFFF" fill-opacity=".045" stroke="#FFFFFF" stroke-opacity=".14"/>
+  <text x="58" y="165" text-anchor="middle" fill="#E2E8F0" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="11">θₜ₊₁</text>
+</g>
+</svg>
