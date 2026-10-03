@@ -1,279 +1,422 @@
-# Adaptive Fractional Gradient Descent Optimizers (AdaFGD & AdaNCFGD)
+<div align="center">
 
-[![PyPI version](https://badge.fury.io/py/adancfgd.svg)](https://badge.fury.io/py/adancfgd)
-[![GitHub license](https://img.shields.io/github/license/HunLuanZhiZhu/AdaNCFGD.svg)](https://github.com/HunLuanZhiZhu/AdaNCFGD/blob/main/LICENSE)
+<img src="./assets/adancfgd-banner.svg" width="100%" alt="AdaNCFGD — adaptive fractional-gradient optimizers for PyTorch" />
 
-## Description
+<br/>
 
-The `adancfgd` package implements two advanced optimizers combining fractional gradient descent with adaptive learning rates, along with a comprehensive Spiking Neural Network (SNN) framework. Building on PyTorch's SGD, these algorithms enhance convergence and performance for machine learning tasks using fractional calculus-based gradient adjustments.
+<a href="https://pypi.org/project/adancfgd/"><img src="https://img.shields.io/pypi/v/adancfgd?style=for-the-badge&logo=pypi&logoColor=white" alt="PyPI"/></a>
+<img src="https://img.shields.io/badge/Python-%3E%3D3.6-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python >= 3.6"/>
+<img src="https://img.shields.io/badge/PyTorch-%3E%3D1.7-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" alt="PyTorch >= 1.7"/>
+<a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-059669?style=for-the-badge" alt="MIT License"/></a>
+
+<br/><br/>
+
+**Research code and PyTorch package for adaptive fractional-gradient optimization.**
+
+</div>
+
+---
 
 ## Overview
 
-This package provides two novel optimization algorithms and a complete SNN implementation:
+**AdaNCFGD** is a research-oriented optimization project centered on two PyTorch optimizers:
 
-### Optimizers
-1. **AdaFGD** - Adaptive Fractional Gradient Descent: Uses fractional derivatives for gradient adjustment with adaptive learning rates.
-2. **AdaNCFGD** - Adaptive Non-Causal Fractional Gradient Descent: Extends AdaFGD by considering multiple previous parameter values.
+- **AdaFGD — Adaptive Fractional Gradient Descent**
+- **AdaNCFGD — Adaptive Non-Causal Fractional Gradient Descent**
 
-### Spiking Neural Network (SNN) Components
-- **Core Layers**: SNNLinear, SNNConv2d, SNNDropout
-- **Batch Normalization**: SNNBatchNorm1d, SNNBatchNorm2d
-- **Composite Layers**: SNNLinearWithBatchNorm, SNNConv2dWithBatchNorm
-- **Complete Models**: SNN, SNNCNN
+Both methods transform the ordinary gradient into a **surrogate optimization gradient** using two ingredients:
+
+1. a fractional-gradient term derived from parameter history; and
+2. an adaptive term built from running first- and second-moment statistics.
+
+The repository also contains a Spiking Neural Network (SNN) implementation used as a research testbed, together with an MNIST training pipeline.
+
+The optimizer package is available on PyPI as **`adancfgd`**.
+
+---
+
+## Research idea
+
+Ordinary gradient-based optimization uses the current gradient:
+
+~~~text
+current parameters θₜ
+        │
+        ▼
+   gradient gₜ
+        │
+        ▼
+parameter update
+~~~
+
+AdaFGD and AdaNCFGD additionally retain information about previous parameter states.
+
+Conceptually:
+
+~~~text
+current gradient gₜ
+        │
+        ├──────────────► adaptive moment statistics
+        │
+        ▼
+parameter history
+        │
+        ▼
+fractional-gradient term
+        │
+        └──────────────┐
+                       ▼
+             surrogate gradient
+                       │
+                       ▼
+                  SGD update
+~~~
+
+The optimizer classes inherit from PyTorch's `SGD`. They replace the parameter gradient with the constructed surrogate gradient, then delegate the final parameter update to the parent SGD implementation.
+
+---
+
+## AdaFGD
+
+AdaFGD keeps the previous parameter state and previous gradient.
+
+For a parameter displacement
+
+~~~text
+Δθₜ = θₜ - θₜ₋₁
+~~~
+
+the implementation constructs a fractional term containing
+
+~~~text
+1 / Γ(2 - α)
+~~~
+
+and a displacement factor proportional to
+
+~~~text
+(|Δθₜ| + ε)^(1 - α)
+~~~
+
+where:
+
+- `α` is the fractional order, constrained to `0 < α < 2`;
+- `ε` is a small numerical-stability constant.
+
+The implementation then multiplies this fractional term by an adaptive factor derived from bias-corrected moment estimates.
+
+Relevant implementation:
+
+**[`adancfgd/adancfgd.py`](./adancfgd/adancfgd.py)**
+
+---
+
+## AdaNCFGD
+
+AdaNCFGD extends the same construction by retaining **two previous parameter states**.
+
+It uses:
+
+~~~text
+θₜ
+θₜ₋₁
+θₜ₋₂
+~~~
+
+and checks the direction of parameter displacement across those states.
+
+Depending on whether the optimization trajectory keeps or changes direction, the implementation selects between:
+
+- a single-history fractional contribution; or
+- a combination of contributions involving the two previous states.
+
+This gives AdaNCFGD a richer history-dependent update rule than AdaFGD while preserving the same adaptive-moment layer and PyTorch optimizer interface.
+
+---
+
+## Adaptive term
+
+Both optimizers maintain running statistics using `betas=(β₁, β₂)`.
+
+The implementation tracks:
+
+- a first statistic based on the sign of the gradient;
+- a second statistic based on the squared gradient;
+- optional AMSGrad-style maximum second moments.
+
+After bias correction, an adaptive multiplier is formed and combined with the fractional term.
+
+This project therefore separates the update into two conceptual components:
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### Fractional component
+Uses parameter history and the fractional order `α` to modify the optimization direction / magnitude.
+
+</td>
+<td width="50%" valign="top">
+
+### Adaptive component
+Uses running gradient statistics to rescale the fractional contribution.
+
+</td>
+</tr>
+</table>
+
+---
 
 ## Installation
 
-The package has been successfully uploaded to PyPI. You can install it directly from PyPI or from the source code.
+### PyPI
 
-### From PyPI
-
-```bash
+~~~bash
 pip install adancfgd
-```
+~~~
 
-### From Source
+### From source
 
-```bash
+~~~bash
 git clone https://github.com/HunLuanZhiZhu/AdaNCFGD.git
 cd AdaNCFGD
 pip install -e .
-```
+~~~
 
-## Dependencies
+Package metadata currently declares:
 
-- PyTorch >= 1.7.0
-- NumPy
-- Python >= 3.6
+~~~text
+Python >= 3.6
+PyTorch >= 1.7.0
+NumPy
+~~~
 
-## Key Features
+---
+
+## Quick start
 
 ### AdaFGD
-- Utilizes fractional derivatives for gradient adjustment
-- Incorporates adaptive learning rates using first and second moment estimates
-- Maintains parameter history for fractional gradient calculation
-- Parameter updates handled by parent SGD class
-- Supports AMSGrad variant
-- Compatible with all PyTorch models
 
-### AdaNCFGD
-- Extends AdaFGD with non-causal fractional gradient descent
-- Considers multiple previous parameter values (two steps back)
-- Adapts gradient calculation based on parameter direction changes
-- Maintains richer parameter history
-- Supports all AdaFGD features
-- Enhanced convergence for complex models
-
-### SNN Components
-- Spike-based neural network implementation
-- Surrogate gradient approach for training
-- Support for both fully connected and convolutional architectures
-- Batch normalization for spike data
-- Dropout regularization for SNNs
-- Complete SNN and SNNCNN models
-
-## API Documentation
-
-### Optimizers
-
-#### AdaFGD
-
-```python
-AdaFGD(params, lr=0.001, alpha=1.0, epsilon=1e-4, momentum=0.0, dampening=0.0, weight_decay=0.0, nesterov=False, betas=(0.9, 0.999), eps=1e-8, amsgrad=False, maximize=False, foreach=None, differentiable=False, fused=None)
-```
-
-**Parameters:**
-- `params`: Iterable of parameters to optimize or dicts defining parameter groups
-- `lr`: Learning rate (default: 0.001)
-- `alpha`: Fractional order (must satisfy 0 < alpha < 2, default: 1.0)
-- `epsilon`: Small positive constant to avoid division by zero (default: 1e-4)
-- `momentum`: Momentum factor (default: 0.0)
-- `dampening`: Dampening for momentum (default: 0.0)
-- `weight_decay`: Weight decay (L2 penalty, default: 0.0)
-- `nesterov`: Enables Nesterov momentum (default: False)
-- `betas`: Coefficients used for computing running averages of gradient and its square (default: (0.9, 0.999))
-- `eps`: Term added to the denominator to improve numerical stability (default: 1e-8)
-- `amsgrad`: Whether to use the AMSGrad variant (default: False)
-
-#### AdaNCFGD
-
-```python
-AdaNCFGD(params, lr=0.001, alpha=1.0, epsilon=1e-4, momentum=0.0, dampening=0.0, weight_decay=0.0, nesterov=False, betas=(0.9, 0.999), eps=1e-8, amsgrad=False, maximize=False, foreach=None, differentiable=False, fused=None)
-```
-
-**Parameters:**
-- Same as AdaFGD, with the addition of non-causal fractional gradient calculation
-
-### SNN Components
-
-#### SNNLinear
-
-```python
-SNNLinear(in_features, out_features, bias=True, window_t=100, threshold_voltage=15, initial_potential_ratio=0.5, w_mean=0, w_std=1, device=None, dtype=None)
-```
-
-#### SNNConv2d
-
-```python
-SNNConv2d(input_shape, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True, window_t=100, threshold_voltage=15, initial_potential_ratio=0.5, w_mean=0, w_std=1, device=None, dtype=None)
-```
-
-#### SNNCNN
-
-```python
-SNNCNN(device=None, dtype=None)
-```
-
-## Usage Examples
-
-### Example 1: Using AdaFGD with a Simple Model
-
-```python
+~~~python
 import torch
 import torch.nn as nn
 from adancfgd import AdaFGD
 
-# Create a simple model
 model = nn.Linear(10, 1)
 
-# Initialize optimizer with default parameters
-optimizer = AdaFGD(model.parameters(), lr=0.001, alpha=1.0)
+optimizer = AdaFGD(
+    model.parameters(),
+    lr=1e-3,
+    alpha=1.0,
+)
 
-# Training loop
-inputs = torch.randn(32, 10)
-targets = torch.randn(32, 1)
+x = torch.randn(32, 10)
+y = torch.randn(32, 1)
 criterion = nn.MSELoss()
 
-for epoch in range(10):
-    optimizer.zero_grad()
-    outputs = model(inputs)
-    loss = criterion(outputs, targets)
-    loss.backward()
-    optimizer.step()
-    print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}")
-```
+optimizer.zero_grad()
+loss = criterion(model(x), y)
+loss.backward()
+optimizer.step()
+~~~
 
-### Example 2: Using AdaNCFGD with a CNN
+### AdaNCFGD
 
-```python
-import torch
-import torch.nn as nn
+~~~python
 from adancfgd import AdaNCFGD
 
-# Create a simple CNN
-model = nn.Sequential(
-    nn.Conv2d(3, 32, kernel_size=3, padding=1),
-    nn.ReLU(),
-    nn.MaxPool2d(2),
-    nn.Flatten(),
-    nn.Linear(32 * 16 * 16, 10)
+optimizer = AdaNCFGD(
+    model.parameters(),
+    lr=1e-3,
+    alpha=1.2,
+    betas=(0.9, 0.999),
 )
+~~~
 
-# Initialize optimizer
-optimizer = AdaNCFGD(model.parameters(), lr=0.0001, alpha=1.0, betas=(0.9, 0.999))
+The classes follow the standard PyTorch optimizer pattern, so they can be inserted into existing training loops without changing model code.
 
-# Training loop (simplified)
-inputs = torch.randn(32, 3, 32, 32)
-targets = torch.randint(0, 10, (32,))
-criterion = nn.CrossEntropyLoss()
+---
 
-for epoch in range(5):
-    optimizer.zero_grad()
-    outputs = model(inputs)
-    loss = criterion(outputs, targets)
-    loss.backward()
-    optimizer.step()
-    print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}")
-```
+## Main optimizer parameters
 
-### Example 3: Using SNN Components
+| Parameter | Default | Meaning |
+|---|---:|---|
+| `lr` | `0.001` | Base learning rate passed to SGD |
+| `alpha` | `1.0` | Fractional order; must satisfy `0 < α < 2` |
+| `epsilon` | `1e-4` | Stability term used in the fractional displacement factor |
+| `betas` | `(0.9, 0.999)` | Running-statistic coefficients |
+| `eps` | `1e-8` | Stability term in the adaptive factor |
+| `amsgrad` | `False` | Enable the AMSGrad-style second-moment maximum |
+| `momentum` | `0.0` | SGD momentum |
+| `weight_decay` | `0.0` | SGD weight decay |
+| `nesterov` | `False` | Enable Nesterov momentum |
 
-```python
-import torch
-from adancfgd import SNNLinear, SNNConv2d, SNNDropout, SNNSequential
+The optimizer also exposes compatible `maximize`, `foreach`, `differentiable`, and `fused` arguments where supported by the installed PyTorch version.
 
-# Create a simple SNN model using SNNSequential
-snn_model = SNNSequential(
-    SNNLinear(784, 256),
-    SNNDropout(p=0.5),
-    SNNLinear(256, 10)
+---
+
+## SNN research framework
+
+The package exports an accompanying SNN implementation used for experimentation.
+
+Available components include:
+
+| Component | Role |
+|---|---|
+| `SNNLinear` | Spiking fully connected layer |
+| `SNNConv2d` | Spiking convolution layer |
+| `SNNBatchNorm1d` / `SNNBatchNorm2d` | Batch normalization |
+| `SNNLinearWithBatchNorm` | Composite linear SNN layer |
+| `SNNConv2dWithBatchNorm` | Composite convolutional SNN layer |
+| `SNNDropout` | Dropout for spike representations |
+| `SNN` | Multi-layer fully connected SNN |
+| `SNNCNN` | Convolutional SNN model |
+
+Example:
+
+~~~python
+from adancfgd import SNNLinear, SNNDropout
+
+layer = SNNLinear(784, 256)
+dropout = SNNDropout(p=0.5)
+~~~
+
+The SNN code is part of the research environment around the optimizers; the core optimizer implementation remains usable with ordinary PyTorch models.
+
+---
+
+## MNIST experiment pipeline
+
+The repository includes **[`train_mnist.py`](./train_mnist.py)** for SNN experiments on MNIST.
+
+The script contains:
+
+- Bernoulli spike encoding;
+- SNN training and evaluation;
+- checkpoint/history handling;
+- learning-rate scheduling;
+- CPU/CUDA device selection.
+
+The dataset is expected locally under the configured data directory; the current script does not automatically download MNIST.
+
+---
+
+## Convergence sanity check
+
+The repository contains two existing diagnostic figures:
+
+<div align="center">
+
+<img src="./adafgd_vs_adancfgd_convergence.png" width="48%" alt="AdaFGD and AdaNCFGD convergence sanity check"/>
+<img src="./adafgd_vs_adancfgd_diff.png" width="48%" alt="Loss difference between AdaFGD and AdaNCFGD"/>
+
+</div>
+
+These plots come from the simple linear-regression sanity check implemented in `adancfgd/adancfgd.py`.
+
+They are intended to verify optimizer behavior on a controlled toy problem. They should **not** be interpreted as a general benchmark establishing superiority over standard optimizers.
+
+Run the check with:
+
+~~~bash
+python -m adancfgd.adancfgd
+~~~
+
+---
+
+## Repository structure
+
+~~~text
+AdaNCFGD/
+├── adancfgd/
+│   ├── __init__.py
+│   ├── adancfgd.py        # AdaFGD + AdaNCFGD
+│   ├── snn.py             # SNN layers / models
+│   └── snn_cnn.py         # convolutional SNN
+│
+├── train_mnist.py         # SNN experiment pipeline
+├── data/                  # local experiment data
+│
+├── adafgd_vs_adancfgd_convergence.png
+├── adafgd_vs_adancfgd_diff.png
+│
+├── setup.cfg
+├── pyproject.toml
+├── setup.py
+├── LICENSE
+└── README.md
+~~~
+
+---
+
+## Package API
+
+The top-level package currently exports:
+
+~~~python
+from adancfgd import (
+    AdaFGD,
+    AdaNCFGD,
+    ForwardFirstBackwardSecond,
+    SNNDropout,
+    SNNBatchNorm1d,
+    SNNBatchNorm2d,
+    SNNLinear,
+    SNNLinearWithBatchNorm,
+    SNNConv2d,
+    SNNConv2dWithBatchNorm,
+    SNN,
+    SNNCNN,
+    pool_spikes,
 )
+~~~
 
-# Create test data
-spikes = torch.randn(10, 32, 784)  # (time_steps, batch, features)
+Current package version:
 
-# Forward pass
-output = snn_model.step(spikes)
-print(f"Output shape: {output.shape}")
-```
+~~~text
+0.1.5
+~~~
 
-### Example 4: Training SNNCNN on MNIST
+---
 
-```python
-import torch
-from adancfgd import SNNCNN
-from adancfgd.train_mnist import train
+## Research use
 
-# Create SNNCNN model
-model = SNNCNN()
+This repository should be treated as a **research codebase**.
 
-# Train on MNIST dataset
-train(model, 'snncnn_test', epochs=10, batch_size=50)
-```
+The optimizer implementation is packaged for convenient reuse, while the SNN code and training scripts preserve the surrounding experimental environment.
 
-## Performance Comparison
+When evaluating the methods, use controlled experiments with matched:
 
-### Convergence Speed
+- model initialization;
+- learning-rate search;
+- training budget;
+- data split;
+- random seeds;
+- optimizer-specific hyperparameters.
 
-AdaFGD and AdaNCFGD have been shown to converge faster than traditional optimizers like SGD and Adam for certain tasks, especially for models with complex loss landscapes.
+The simple diagnostic plots included in this repository are not a substitute for task-level ablation or benchmark results.
 
-### Accuracy
-
-For image classification tasks, these optimizers can achieve higher final accuracy compared to standard optimizers when used with appropriate hyperparameters.
-
-### SNN Performance
-
-The SNN implementation supports efficient training of spiking neural networks using surrogate gradients, achieving competitive performance with traditional ANN models on MNIST and other datasets.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Authors
-
-- **Yihe Zhu** - *Initial work* - [HunLuanZhiZhu](https://github.com/HunLuanZhiZhu)
-
-## Acknowledgments
-
-- This work was inspired by recent advances in fractional calculus and adaptive optimization algorithms.
-- Built on PyTorch's robust deep learning framework.
-
-## Contact
-
-- Email: zhu.yihe@qq.com
-- GitHub: [https://github.com/HunLuanZhiZhu/AdaNCFGD](https://github.com/HunLuanZhiZhu/AdaNCFGD)
-
-## Version History
-
-- **0.1.5** - Enhanced package stability, improved documentation, fixed minor issues, verified uninstall-reinstall functionality
-- **0.1.4** - Complete SNN implementation, fixed import issues, improved documentation
-- **0.1.3** - Fixed package structure, updated __init__.py
-- **0.1.2** - Initial release with AdaFGD and AdaNCFGD optimizers
+---
 
 ## Citation
 
-If you use this package in your research, please consider citing:
+If you use the software in research, you can currently cite the repository:
 
-```
-@software{adancfgd2025,
-  author = {Yihe Zhu},
-  title = {adancfgd: Adaptive Fractional Gradient Descent Optimizers and SNN Framework},
-  year = {2025},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/HunLuanZhiZhu/AdaNCFGD}},
+~~~bibtex
+@software{zhu_adancfgd,
+  author       = {Yihe Zhu},
+  title        = {AdaNCFGD: Adaptive Fractional Gradient Descent Optimizers},
+  url          = {https://github.com/HunLuanZhiZhu/AdaNCFGD},
+  version      = {0.1.5},
+  note         = {Research software}
 }
-```
+~~~
+
+A publication-specific citation can be added here when appropriate.
+
+---
+
+## License
+
+MIT — see [LICENSE](./LICENSE).
+
